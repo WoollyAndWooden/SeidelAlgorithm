@@ -13,6 +13,7 @@ class Seidel:
         Hb = numpy.array(Hb)
         self.x = x
         self.y = y
+        self.status = 0
 
         self.f = lambda xp, yp: xp * self.x + yp * self.y
 
@@ -23,7 +24,6 @@ class Seidel:
         self.result = None
 
 
-        print(type(Hx))
         if Hx.shape[0] != Hy.shape[0] or Hx.shape[0] != Hb.shape[0]:
             raise ValueError("Constraints arrays length do not match")
 
@@ -91,7 +91,7 @@ class Seidel:
         if possibleSolutions:
             legalSolutions = []
             for i in possibleSolutions:
-                if self.isPointLegal(possibleSolutions[0], possibleSolutions[1]):
+                if self.isPointLegal(i[0], i[1]):
                     legalSolutions.append(i)
 
             if not legalSolutions:
@@ -113,12 +113,11 @@ class Seidel:
 
         self.getResult()
 
-
     def isPointLegal(self, x, y):
         return x >= 0 and y >= 0
 
     def applyConstraint(self, constraint: Constraint):
-        if constraint.contains(self.solution):
+        if constraint.contains(self.solution[0], self.solution[1]):
             self.applied.append(constraint)
 
         intersections = []
@@ -130,7 +129,7 @@ class Seidel:
                 break
 
             for j in self.applied:
-                if not j.contains(result[0]):
+                if not j.contains(result[0], result[1]):
                     break
 
             intersections.append(result[0])

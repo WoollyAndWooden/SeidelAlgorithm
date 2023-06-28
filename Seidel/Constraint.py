@@ -66,7 +66,7 @@ class Constraint:
             return [[resultX, resultY], 1]
 
         if l1.y == 0:
-            resultX = l1.b / l1.y
+            resultX = l1.b / l1.x
 
             if l2.y == 0:
                 resultY = l2.b / l2.y
