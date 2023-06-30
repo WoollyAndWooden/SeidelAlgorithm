@@ -45,6 +45,7 @@ ograniczenia_y = [[0, 1, -2], [-1, 1, 0], [1, 1, 0], [0, -1, -2], [-2, -1, -2], 
 
 
 
+
 # pomocnicza funkcja
 def print_ograniczenia(ograniczenia):
     print("Aktualny status ograniczeń:")
@@ -138,7 +139,7 @@ def wyznacz_h_startowe(ograniczenia, h_min):
 
     for o in o_temp:
         if o[0] != 0 or o[1] != 1:
-
+            chj = 0
             # TODO c 3.1 3.2 3.3 ogarnij to ladnie
             # potem masz gotowa baze zeby rozwiazywac rownania liniowe
 
@@ -148,19 +149,19 @@ def wyznacz_h_startowe(ograniczenia, h_min):
 
 def unormowanie(ograniczenia):
     # TODO zamien potem c na o bo sie rozmyslilem i wole po polsku bo mam notatki po polsku
-    for c in ograniczenia:
+    for o in ograniczenia:
         # jeżeli A != 0, to dzielimy ograniczenie przez |A|
-        if c[0] != 0:
-            temp = abs(c[0])
-            c[0] = c[0] / temp
-            c[1] = c[1] / temp
-            c[2] = c[2] / temp
+        if o[0] != 0:
+            temp = abs(o[0])
+            o[0] = o[0] / temp
+            o[1] = o[1] / temp
+            o[2] = o[2] / temp
 
         # jeżeli A == 0 i B != 0, to dzielimy ograniczenie przez |B|
-        if c[0] == 0 and c[1] != 0:
-            temp = abs(c[1])
-            c[1] = c[1] / temp
-            c[2] = c[2] / temp
+        if o[0] == 0 and o[1] != 0:
+            temp = abs(o[1])
+            o[1] = o[1] / temp
+            o[2] = o[2] / temp
 
 
 def seidel(ograniczenia):
