@@ -88,6 +88,7 @@ def czy_sprzeczny(ograniczenia, h_min):
         # przypadek A.5
         if h_min[0] == 0 and o[0] == 0 and o[1] > -h_min[1]:
             return True
+    return False
 
 def wyznacz_h_startowe(ograniczenia, h_min):
     # B

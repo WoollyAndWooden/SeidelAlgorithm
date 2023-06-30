@@ -1,6 +1,6 @@
 import pytest
 
-from Seidel.main import seidel
+from Seidel.main import seidel, czy_sprzeczny
 
 
 class TestSeidel:
@@ -40,3 +40,6 @@ class TestSeidel:
         seidel(ograniczenia_y)
         captured = capsys.readouterr()
         assert captured.out == "Unormowano"
+
+    def test_sprzecznosc(self):
+        assert czy_sprzeczny([[-1, -1, 2], [1, 1, 0]], [1, 1, 0]) == False
