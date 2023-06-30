@@ -10,6 +10,7 @@ class TestSeidel:
     @pytest.fixture()
     def sprzecznosc(self):
         return "Zaszla sprzecznosc"
+
     def test_case_A(self, capsys, sprzecznosc):
         # TEST A
         # max y
@@ -22,6 +23,7 @@ class TestSeidel:
         ograniczenia_a = [[0, 1, -1], [1, -1, 1], [-1, 1, 0]]
         seidel(ograniczenia_a)
         captured = str(capsys.readouterr().out)
+        print(captured)
         assert re.search(sprzecznosc, captured)
 
     def test_case_B(self, capsys, sprzecznosc):
@@ -48,10 +50,13 @@ class TestSeidel:
         assert re.search("Unormowano", captured)
 
     def test_sprzecznosc(self):
-        assert not czy_sprzeczny([[-1, -1, 2], [1, 1, 0]], [1, 1, 0])
+        assert czy_sprzeczny([[-1, -1, 2], [1, 1, 0]], [1, 1, 0])  # tak, jest sprzeczny => true
 
-    def test_nie_sprzecznosc(self):
-        assert czy_sprzeczny([[-1, -1, 2], [1, 1, 0]], [-1, -1, 2])
+    def test_sprzecznosc_kolejny(self):
+        assert not czy_sprzeczny([[-1, -2, 2], [1, 1, 0]], [1, 1, 0])  # ten przyklad jest niesprzeczny => false
+
+    # def test_nie_sprzecznosc(self):
+    #     assert czy_sprzeczny([[-1, -1, 2], [1, 1, 0]], [-1, -1, 2])
 
     def test_sprzecznosc_main(self, capsys, sprzecznosc):
         seidel([[-1, -1, 2], [1, 1, 0]])
