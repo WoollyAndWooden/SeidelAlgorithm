@@ -177,9 +177,10 @@ def seidel(ograniczenia):
     print(h_min)
 
     # 5.A sprawdz sprzecznosc
-    if(czy_sprzeczny(ograniczenia, h_min)):
+    if czy_sprzeczny(ograniczenia, h_min):
         print("Zaszla sprzecznosc, kończę...")
-    print("Nie ma sprzecznosci")
+    else:
+        print("Nie ma sprzecznosci")
 
     # 5.B
 

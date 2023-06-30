@@ -1,10 +1,16 @@
+import re
+
 import pytest
 
 from Seidel.main import seidel, czy_sprzeczny
 
 
 class TestSeidel:
-    def test_case_A(self, capsys):
+
+    @pytest.fixture()
+    def sprzecznosc(self):
+        return "Zaszla sprzecznosc"
+    def test_case_A(self, capsys, sprzecznosc):
         # TEST A
         # max y
         #
@@ -15,10 +21,10 @@ class TestSeidel:
         # :::: sprzeczny
         ograniczenia_a = [[0, 1, -1], [1, -1, 1], [-1, 1, 0]]
         seidel(ograniczenia_a)
-        captured = capsys.readouterr()
-        assert captured.out == "Zaszla sprzecznosc, kończę..."
+        captured = str(capsys.readouterr().out)
+        assert re.search(sprzecznosc, captured)
 
-    def test_case_B(self, capsys):
+    def test_case_B(self, capsys, sprzecznosc):
         # TEST B
         # max
         # y
@@ -32,14 +38,22 @@ class TestSeidel:
 
         ograniczenia_b = [[0, 1, -1], [1, -1, 1], [-2, 1, 0], [1, 1, 0]]
         seidel(ograniczenia_b)
-        captured = capsys.readouterr()
-        assert captured.out == "Zaszla sprzecznosc, kończę..."
+        captured = str(capsys.readouterr().out)
+        assert re.search(sprzecznosc, captured)
 
     def test_case_Y(self, capsys):
         ograniczenia_y = [[0, 1, -2], [-1, 1, 0], [1, 1, 0], [0, -1, -2], [-2, -1, -2], [2, 1, 2]]
         seidel(ograniczenia_y)
-        captured = capsys.readouterr()
-        assert captured.out == "Unormowano"
+        captured = str(capsys.readouterr().out)
+        assert re.search("Unormowano", captured)
 
     def test_sprzecznosc(self):
-        assert czy_sprzeczny([[-1, -1, 2], [1, 1, 0]], [1, 1, 0]) == False
+        assert not czy_sprzeczny([[-1, -1, 2], [1, 1, 0]], [1, 1, 0])
+
+    def test_nie_sprzecznosc(self):
+        assert czy_sprzeczny([[-1, -1, 2], [1, 1, 0]], [-1, -1, 2])
+
+    def test_sprzecznosc_main(self, capsys, sprzecznosc):
+        seidel([[-1, -1, 2], [1, 1, 0]])
+        captured = str(capsys.readouterr().out)
+        assert re.search(sprzecznosc, captured)
