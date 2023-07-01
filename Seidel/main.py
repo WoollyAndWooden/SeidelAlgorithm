@@ -1,28 +1,27 @@
-# nie potrzebujemy inputu od uzytkownika, mozemy go miec hardcode'owanego
-# z przykladami od prof. Żylińskiego i własnymi
-
-# TODO zrobić funkcję podającą przykład seidlowi (można w pętli kilka przykładów)
-# ewentualnie po prostu input od uzytkownika wybierajacy ktory przyklad
-
-# potrzebujemy klasy na
-# - funkcję celu
-# - ograniczenia
-# reszta wyjdzie w praniu
-import copy
 import numpy
 
-
-# pomocnicza funkcja
 def print_ograniczenia(ograniczenia):
     print("Aktualny status ograniczeń:")
     for o in ograniczenia:
         print(o)
     print()
 
+def y_przeciecia(linia1, linia2):
+    a1 = linia1[0]
+    a2 = linia2[0]
+    b1 = linia1[1]
+    b2 = linia2[1]
+    c1 = linia1[2]
+    c2 = linia2[2]
+    print(f"Linia1: {linia1}")
+    print(f"Linia2: {linia2}")
+    y = (a2 * c1 - a1 * c2)/(-a2 * b1 + a1*b2)
+    print(f"y przeciecia: {y}")
+    return y
 
 
 def wyznacz_h_min(ograniczenia):
-    # sprawdz czy mamy ograniczenie spelniajace w postaci (0, 1, C)
+    # sprawdz czy mamy ograniczenie w postaci (0, 1, C)
     for o in ograniczenia:
         if o[0] == 0 and o[1] == 1:
             return o
@@ -65,7 +64,7 @@ def czy_sprzeczny(ograniczenia, h_min):
 def wyznacz_h_startowe(ograniczenia, h_min):
     # B
     if h_min[1] <= 0:
-        print(" 5b:  Przypadek nieograniczony")
+        print(" 5b:  Przypadek nieograniczony, obszar nieograniczony")
         return None
 
     # C.1
@@ -77,7 +76,7 @@ def wyznacz_h_startowe(ograniczenia, h_min):
             if (0 <= o[1] <= h_min[1]) or (-h_min[1] < o[1] < 0):
                 print("C.1: Zwracamy H1 i H2")
                 return h_min, o  # zwracamy jako H1, H2 = (H_min, H_j) gdzie o = H_j
-            if -h_min[1] == o[1]:  # przypadek nieograniczony niesprzeczny
+            if -h_min[1] == o[1]:
                 print("C.1 -> Przypadek nieograniczony")
                 return None
 
@@ -90,8 +89,8 @@ def wyznacz_h_startowe(ograniczenia, h_min):
             if o[1] == h_min[1] or abs(o[1]) < abs(h_min[1]):
                 print("C.2 -> Zwracamy H1 i H2")
                 return h_min, o  # zwracamy jako H1, H2 = (H_min, H_j) gdzie o = H_j
-            if -h_min[1] == o[1]:  # przypadek nieograniczony niesprzeczny
-                print("C.2 -> Przypadek nieograniczony")
+            if -h_min[1] == o[1]:
+                print("C.2 -> Przypadek nieograniczony niesprzeczny")
                 return None
 
     o_temp = []
@@ -103,8 +102,8 @@ def wyznacz_h_startowe(ograniczenia, h_min):
 
     print("Wyrzucamy takie Hi: (0, -1, Ci)")
     for o in ograniczenia:
-        if numpy.array_equiv(o, h_min):
-            continue
+        # if numpy.array_equiv(o, h_min):
+        #     continue
         if not (h_min[0] == 0 and h_min[1] == 1):  # Czy H_min = (0, 1, Cmin)
             raise Exception("H_min nieprzewidzianej postaci")
         # C.3.1 Wyrzucamy Hi = (0, -1, Ci)
@@ -172,18 +171,30 @@ def wyznacz_h_startowe(ograniczenia, h_min):
 
     h_with_xl = sorted(h_with_xl, key=lambda x: x[1], reverse=True)
     h_with_xp = sorted(h_with_xp, key=lambda x: x[1])
+    # if not = jezeli pusta
+    # jezeli nie ma xp, a sa xl
+    if not h_with_xp and h_with_xl:
+        print(f"Rozwiązanie jest na prostej y = {-h_max[2]} z opt = ({h_with_xl[0][1]}, {-h_max[2]})")
+        return None
+    if h_with_xp and not h_with_xl:
+        print(f"Rozwiązanie jest na prostej y = {-h_max[2]} z opt = ({h_with_xp[0][1]}, {-h_max[2]})")
+        return None
 
     if h_with_xl[0][1] < h_with_xp[0][1]:
-        print(f"Nieskonczenie wiele rozwiązań, opt = {-h_max[2]}")
+        print(f"Nieskonczenie wiele rozwiązań na odcinku, ({h_with_xl[0][1]}, {-h_max[2]}) - ({h_with_xp[0][1]}, {-h_max[2]})")
     elif h_with_xl[0][1] == h_with_xp[0][1]:
         print(f"Uniknalne rozwiązanie, xl = {h_with_xl[0][1]}, opt = {-h_max[2]}")
     else:
-        print("Placceholder")
-
-
-
-
-
+        if h_with_xl[0][0][0] == h_with_xp[0][0][1] and h_with_xl[0][0][1] == h_with_xp[0][0][0]:
+            print("C 3.3+  Sprzeczność - proste nie przecinają się")
+            return None
+        y = y_przeciecia(h_with_xl[0][0], h_with_xp[0][0])
+        if y > -h_max[2]:
+            print("C3.3 Sprzeczność - punkt przecięcia powyżej H_max")
+            return None
+        else:
+            print("C.3.3: Zwracamy H1 i H2")
+            return h_with_xl[0][1], h_with_xp[0][1]
 
 
 def unormowanie(ograniczenia):
@@ -200,6 +211,7 @@ def unormowanie(ograniczenia):
             temp = abs(o[1])
             o[1] = o[1] / temp
             o[2] = o[2] / temp
+
 
 
 def seidel(ograniczenia):
@@ -223,17 +235,21 @@ def seidel(ograniczenia):
         print("Nie ma sprzecznosci")
 
     # 5.B, 5.C
-    wyznacz_h_startowe(ograniczenia, h_min)
+    h1, h2 = wyznacz_h_startowe(ograniczenia, h_min)
+    if h1 is not None:
+        print(f"H1: {h1}, H2: {h2}")
 
 
-ograniczenia_a = [[0, 1, -1], [1, -1, 1], [-1, 1, 0]]  # TODO  spodziewany: sprzeczny | wyszlo: NOT YET FINISHED
-ograniczenia_b = [[0, 1, -1], [1, -1, 1], [-2, 1, 0], [1, 1, 0]]  # TODO spodziewany: sprzeczny | wyszlo: NOT YET FINISHED
+ograniczenia_a = [[0, 1, -1], [1, -1, 1], [-1, 1, 0]]  # spodziewany: sprzeczny | wyszlo: sprzeczny
+ograniczenia_b = [[0, 1, -1], [1, -1, 1], [-2, 1, 0], [1, 1, 0]]  # spodziewany: sprzeczny | wyszlo: niedokończone
 ograniczenia_c = [[1, -1, 0], [0, -1, 1], [-1, -1, 1], [2, -1, 0]]  # spodziewany: nieograniczony opt inft | wyszlo: nieograniczony
-ograniczenia_d = [[0, 1, -2], [-1, 1, -2], [0, -1, 0], [-1, -1, -2]]  # TODO spodziewany: nieograniczony z opt | wyszlo: NOT YET FINISHED
-ograniczenia_y = [[0, 1, -2], [-1, 1, 0], [1, 1, 0], [0, -1, -2], [-2, -1, -2], [2, 1, 2]]
+ograniczenia_d = [[0, 1, -2], [-1, 1, -2], [0, -1, 0], [-1, -1, -2]]  # spodziewany: nieograniczony z opt w np (0, 2) | wyszlo dobrze
+ograniczenia_e = [[0, 1, -2], [-1, 1, -4], [0, -1, 0], [1, -1, 0]] # OPT na odcinku, jego końce to (-2,2)-(2,2) | wyszlo dobrze
+ograniczenie_f = [[0, 1, -2], [-1, 1, 0], [1, 1, 0], [0, -1, -2], [-2, -1, -2], [2, 1, 2]]
 
 # ograniczenia_y = [[-1, 1, 0], [1, 1, 0], [0, -1, -2], [-2, -1, -2], [2, 1, 2]]
 
-seidel(ograniczenia_a)
+seidel(ograniczenie_f)
+# wysokosc_przeciecia([1, -1, 3], [-2, -1, 6])
 
 # wektory do polplaszczyzny to po prostu [A, B] z (A, B, C)
